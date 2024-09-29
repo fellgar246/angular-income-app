@@ -15,6 +15,11 @@ import * as authActions from '../auth/auth.actions';
 export class AuthService {
 
   userUnsubscribe!: Unsubscribe;
+  private _user: Usuario | undefined;
+
+  get user() {
+    return {...this._user}
+  }
 
   constructor(private auth: Auth, private firestore: Firestore, private store: Store<AppState> ) { }
 
@@ -26,8 +31,10 @@ export class AuthService {
         const querySnapshot = (await getDocs(q))
         querySnapshot.forEach((doc: any) => {
           this.store.dispatch(authActions.setUser({user: doc.data()}))
+          this._user = doc
         })
       } else {
+        this._user = undefined;
         this.userUnsubscribe ? this.userUnsubscribe() : null;
         this.store.dispatch(authActions.unSetUser());
       }
